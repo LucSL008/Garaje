@@ -18,3 +18,7 @@ def division(a, b):
     producto = division * b
     resto = a - producto
     return resto
+def restar_porcentaje(a, b):
+    porcentaje = a * (b / 100)
+    resultado = a - porcentaje
+    return resultado
