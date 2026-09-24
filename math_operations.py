@@ -1,14 +1,27 @@
-def sumar_matrices(matriz1, matriz2):
-    if len(matriz1) != len(matriz2) or len(matriz1[0]) != len(matriz2[0]):
-        raise ValueError("Las matrices deben tener las mismas dimensiones para sumarlas.")
-    
-    resultado = []
-    for i in range(len(matriz1)):
-        fila_resultado = []
-        for j in range(len(matriz1[0])):
-            fila_resultado.append(matriz1[i][j] + matriz2[i][j])
-        resultado.append(fila_resultado)
-    
+def sumar_matrices():
+    fila1 = [0, 0, 0, 0]
+    fila2 = [0, 0, 0, 0]
+    fila3 = [0, 0, 0, 0]
+    fila4 = [0, 0, 0, 0]
+
+    def sumar_matrices():
+    return [
+        [
+            existencias_pintura[i] * 100,
+            existencias_ventanas[i] * 150,
+            existencias_ruedas[i] * 200,
+            existencias_carroceria[i] * 250,
+        ]
+        for i in range(len(existencias_pintura))
+    ]
+def division(a, b):
+    division = a // b
+    producto = division * b
+    resto = a - producto
+    return resto
+def restar_porcentaje(a, b):
+    porcentaje = a * (b / 100)
+    resultado = a - porcentaje
     return resultado
 def pila_array():
     pila = []
