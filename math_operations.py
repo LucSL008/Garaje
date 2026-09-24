@@ -35,3 +35,8 @@ def restar_porcentaje(a, b):
     porcentaje = a * (b / 100)
     resultado = a - porcentaje
     return resultado
+def sum_numbers(numbers):
+    total = 0
+    for num in numbers:
+        total += num
+    return total
