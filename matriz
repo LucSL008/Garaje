@@ -1,0 +1,48 @@
+matriz = [
+    [0, 0, 0, 0], 
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]]
+
+precios = [100, 150, 200, 250]
+
+posiciones = {
+    "Pintura": 0,
+    "Ventanas": 1,
+    "Ruedas": 2,
+    "Carroceria": 3}
+
+for p in pedido:
+    cantidad = p[0]
+    categoria = p[1]
+    precio = p[2]
+
+    fila = posiciones[categoria]
+    columna = precios.index(precio)
+    matriz[fila][columna] += cantidad
+
+
+print("\MATRIZ")
+print("             Tipo 1  Tipo 2  Tipo 3  Tipo 4")
+print("Pintura     ", matriz[0])
+print("Ventanas    ", matriz[1])
+print("Ruedas      ", matriz[2])
+print("Carroceria  ", matriz[3])
+
+print("\PRECIOS")
+print(precios)
+
+costes = []
+for fila in matriz:
+    coste = 0
+    for i in range(4):
+        coste += fila[i] * precios[i]
+    costes.append(coste)
+
+print("\COSTE POR CATEGORIA")
+print("Pintura:", costes[0])
+print("Ventanas:", costes[1])
+print("Ruedas:", costes[2])
+print("Carroceria:", costes[3])
+
+print("COSTE FINAL:", sum(costes))
