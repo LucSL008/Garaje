@@ -24,7 +24,15 @@ def restar_porcentaje(a, b):
     resultado = a - porcentaje
     return resultado
 def pila_array():
-    pila = []
+    pila = [None] * len(datos)
+tope = -1   # pila vacía
+for valor in datos:
+    i = tope
+    while i >= 0 and pila[i] > valor:
+        pila[i + 1] = pila[i]   
+        i -= 1
+    pila[i + 1] = valor     
+    tope += 1
     return pila
 def division(a, b):
     division = a // b
