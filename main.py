@@ -1,81 +1,214 @@
-Garaje = ["Pintura", "Ventanas", "Ruedas", "Carroceria"]
-#STOCK
-Ruedas = ["Tipo 1", "Tipo 2", "Tipo 3", "Tipo 4"]
-Ruedas[0] = {"existencias": 15, "precio": 100}
-Ruedas[1] = {"existencias": 15, "precio": 150}
-Ruedas[2] = {"existencias": 15, "precio": 200}
-Ruedas[3] = {"existencias": 15, "precio": 250}
+import random
+from stock import CATEGORIAS, TIPOS, PRECIOS, STOCK
+from math_operations import (
+    sumar_lista,
+    restar_porcentaje,
+    ordenar_mayor_a_menor,
+    pila_array,
+    precio_coche,
+)
 
-Ventanas = ["Tipo 1", "Tipo 2", "Tipo 3", "Tipo 4"]
-Ventanas[0] = {"existencias": 10, "precio": 100}
-Ventanas[1] = {"existencias": 10, "precio": 150}
-Ventanas[2] = {"existencias": 10, "precio": 200}
-Ventanas[3] = {"existencias": 10, "precio": 250}
+#constants
+HISTORIAL = []          #lista de coches construidos
+CUOTA = 0               #se fija al construir el primer coche
+INGRESOS = 0            #suma de ganancias
+TAX = 21                #% de impuesto
 
-Pintura = ["Color 1", "Color 2", "Color 3", "Color 4"]
-Pintura[0] = {"existencias": 13, "precio": 100}
-Pintura[1] = {"existencias": 13, "precio": 150}
-Pintura[2] = {"existencias": 13, "precio": 200}
-Pintura[3] = {"existencias": 13, "precio": 250}
 
-Carroceria = ["Tipo 1", "Tipo 2", "Tipo 3", "Tipo 4"]
-Carroceria[0] = {"existencias": 12, "precio": 100}
-Carroceria[1] = {"existencias": 12, "precio": 150}
-Carroceria[2] = {"existencias": 12, "precio": 200}
-Carroceria[3] = {"existencias": 12, "precio": 250}
+#Construir
+def construir_coche():
+    global CUOTA
 
-CAT = {"Pintura": Pintura, "Ventanas": Ventanas, "Ruedas": Ruedas, "Carroceria": Carroceria}
-pedido = []
+    # Matriz 4x4 llena de 0 -> aqui apuntamos lo que elige el jugador
+    contador = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ]
 
-while True:
-    for c in Garaje: print(c, CAT[c])
-    cat = input("Categoria (fin): ")
-    if cat == "fin": break
-    if cat not in CAT: print("No valida."); continue
-    tipo = input("Tipo: ")
-    if tipo not in CAT[cat]: print("No valido."); continue
-    i = CAT[cat].index(tipo)
-    n = int(input("Cantidad: "))
-    if n <= 0 or n > CAT[cat][i]["existencias"]: print("Stock insuficiente."); continue
-    CAT[cat][i]["existencias"] -= n
-    pedido.append([n, cat, CAT[cat][i]["precio"]])
+    for fila in range(4):
+        print(CATEGORIAS[fila])
+        for col in range(4):
+            print(" ", col, TIPOS[col], "precio", PRECIOS[col],
+                  "stock", STOCK[fila][col])
 
-def fila(nombre):
-    return [[p[0], p[2]] for p in pedido if p[1] == nombre]
-#CLAS
-x, y, z = fila("Ruedas"), fila("Ventanas"), fila("Carroceria")
-M = [x, y, z]
+        while True:
+            eleccion = input("Elige 0-3: ")
+            if eleccion == "0" or eleccion == "1" or eleccion == "2" or eleccion == "3":
+                col = int(eleccion)
+                if STOCK[fila][col] > 0:
+                    STOCK[fila][col] = STOCK[fila][col] - 1
+                    contador[fila][col] = contador[fila][col] + 1
+                    break
+                else:
+                    print("Sin stock, elige otro.")
+            else:
+                print("Opcion no valida.")
 
-#Suma
-cr = sum(c * pr for c, pr in x)
-cv = sum(c * pr for c, pr in y)
-cc = sum(c * pr for c, pr in z)
-cp = sum(p[0] * p[2] for p in pedido if p[1] == "Pintura")
+    #Precio total usando la matriz contador * precios
+    total = precio_coche(contador, PRECIOS)
 
-for p in pedido: print(p[0], "x", p[1], "=", p[0] * p[2], "EUR")
-for f in M: print(f)
-print("Coste ruedas:", cr)
-print("Coste ventanas:", cv)
-print("Coste carrocerias:", cc)
-print("Coste pintura:", cp)
-print("TOTAL:", cr + cv + cc + cp)
-TOTAL = cr + cv + cc + cp
+    coche = {
+        "contador": contador,
+        "precio": total,
+        "vendido": False,
+        "venta": 0,
+        "tax": 0,
+        "ganancia": 0,
+    }
+    HISTORIAL.append(coche)
 
-def generate_TAX(cr,cv,cc,cp):
-    if TOTAL > 1000:
-        return False
-    if cr+cc > cv+cp:
-        TAX =TOTAL+cv+cp//100
-    if cr+cc < cv+cp:
-        TAX = TOTAL+cr+cc//100
-        return TAX
-def generate_quota():
-    Quota=Quota
+    #Fijar cuota la primera vez: entre 80% y 150% del precio
+    if CUOTA == 0:
+        minimo = int(total * 0.8)
+        maximo = int(total * 1.5)
+        CUOTA = random.randint(minimo, maximo)
 
+    print("Coche construido. Precio total:", total, "€")
+    print("Cuota a cumplir:", CUOTA, "€")
+
+
+# ---------- HISTORIAL ----------
+def historial():
+    if len(HISTORIAL) == 0:
+        print("No hay coches.")
+        return
+
+    #pila_array invierte 
+    orden = pila_array(HISTORIAL)
+    orden = pila_array(orden)
+
+    print("===== HISTORIAL =====")
+    numero = 1
+    for coche in orden:
+        print("\nCoche #", numero, "| precio:", coche["precio"], "€")
+        for fila in range(4):
+            for col in range(4):
+                if coche["contador"][fila][col] > 0:
+                    print("   ", CATEGORIAS[fila], TIPOS[col],
+                          "x", coche["contador"][fila][col])
+        if coche["vendido"]:
+            print("   Vendido por", coche["venta"], "€",
+                  "| ganancia", coche["ganancia"], "€")
+        else:
+            print("   (No vendido)")
+        numero = numero + 1
+
+
+#vender
 def ganancias():
-    Winnings = cr + cv + cc + cp + 1000
-    RR_Winnings = Winnings*generate_TAX/4
-    if RR_Winnings >= Quota:
-        print("we survive")
+    global INGRESOS
+
+    #Buscar coches no vendidos
+    disponibles = []
+    for c in HISTORIAL:
+        if c["vendido"] == False:
+            disponibles.append(c)
+
+    if len(disponibles) == 0:
+        print("No hay coches para vender.")
+        return
+
+    for i in range(len(disponibles)):
+        print(i, "- precio", disponibles[i]["precio"], "€")
+
+    eleccion = input("Elige coche: ")
+    if eleccion == "" or int(eleccion) < 0 or int(eleccion) >= len(disponibles):
+        print("Opcion no valida.")
+        return
+
+    coche = disponibles[int(eleccion)]
+
+    #Precio de venta = precio + 30%
+    venta = coche["precio"] + coche["precio"] * 30 / 100
+
+    # TAX paso a paso (raw)
+    print("TAX")
+    paso1 = TAX / 100
+    print("1) TAX / 100 =", paso1)
+    paso2 = venta * paso1
+    print("2) venta * paso1 =", venta, "*", paso1, "=", paso2)
+    tax = paso2
+    print("3) TAX =", tax)
+
+    ganancia = venta - tax
+    print("4) ganancia =", venta, "-", tax, "=", ganancia)
+
+    coche["vendido"] = True
+    coche["venta"] = venta
+    coche["tax"] = tax
+    coche["ganancia"] = ganancia
+
+    INGRESOS = INGRESOS + ganancia
+    print("Ingresos acumulados:", INGRESOS, "€")
+
+
+#topearnings
+def top_earnings():
+    ganancias_lista = []
+    for c in HISTORIAL:
+        if c["vendido"] == True:
+            ganancias_lista.append(c["ganancia"])
+
+    if len(ganancias_lista) == 0:
+        print("No hay ventas.")
+        return
+
+    ordenadas = ordenar_mayor_a_menor(ganancias_lista)
+
+    print("TOP EARNINGS")
+    for g in ordenadas:
+        print("  ganancia:", g, "€")
+
+
+#cuota
+def quota():
+    return INGRESOS >= CUOTA
+
+
+#state
+def Estado():
+    print("Estado->")
+    print("Cuota:", CUOTA, "€")
+    print("Ingresos:", INGRESOS, "€")
+    if quota():
+        print("Cuota cumplida: SI")
     else:
-        print("we ded")
+        print("Cuota cumplida: NO")
+
+    print("Stock restante:")
+    for fila in range(4):
+        print(" ", CATEGORIAS[fila], STOCK[fila])
+
+
+#menu
+def menu():
+    while True:
+        print("===== GARAJE =====")
+        print("1. Construir coche")
+        print("2. Historial")
+        print("3. Vender coche")
+        print("4. Top earnings")
+        print("5. Estado")
+        print("6. Salir")
+        op = input("Opcion: ")
+
+        if op == "1":
+            construir_coche()
+        elif op == "2":
+            historial()
+        elif op == "3":
+            ganancias()
+        elif op == "4":
+            top_earnings()
+        elif op == "5":
+            Estado()
+        elif op == "6":
+            break
+        else:
+            print("Nope.")
+
+
+if __name__ == "__main__":
+    menu()

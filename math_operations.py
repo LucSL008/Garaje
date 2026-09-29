@@ -1,50 +1,42 @@
-def sumar_matrices():
-    fila1 = [0, 0, 0, 0]
-    fila2 = [0, 0, 0, 0]
-    fila3 = [0, 0, 0, 0]
-    fila4 = [0, 0, 0, 0]
-
-    def sumar_matrices():
-    return [
-        [
-            existencias_pintura[i] * 100,
-            existencias_ventanas[i] * 150,
-            existencias_ruedas[i] * 200,
-            existencias_carroceria[i] * 250,
-        ]
-        for i in range(len(existencias_pintura))
-    ]
-def division(a, b):
-    division = a // b
-    producto = division * b
-    resto = a - producto
-    return resto
-def restar_porcentaje(a, b):
-    porcentaje = a * (b / 100)
-    resultado = a - porcentaje
-    return resultado
-def pila_array():
-    pila = [None] * len(datos)
-tope = -1   # pila vacía
-for valor in datos:
-    i = tope
-    while i >= 0 and pila[i] > valor:
-        pila[i + 1] = pila[i]   
-        i -= 1
-    pila[i + 1] = valor     
-    tope += 1
-    return pila
-def division(a, b):
-    division = a // b
-    producto = division * b
-    resto = a - producto
-    return resto
-def restar_porcentaje(a, b):
-    porcentaje = a * (b / 100)
-    resultado = a - porcentaje
-    return resultado
-def sum_numbers(numbers):
+def sumar_lista(numeros):
     total = 0
-    for num in numbers:
-        total += num
+    for n in numeros:
+        total = total + n
+    return total
+
+
+def restar_porcentaje(a, b):
+    parte = a * b / 100
+    return a - parte
+
+
+def ordenar_mayor_a_menor(datos):
+    n = len(datos)
+    for i in range(n - 1):
+        for j in range(n - 1 - i):
+            if datos[j] < datos[j + 1]:
+                temp = datos[j]
+                datos[j] = datos[j + 1]
+                datos[j + 1] = temp
+    return datos
+
+
+def pila_array(datos):
+    pila = [0] * len(datos)
+    tope = -1
+    for valor in datos:
+        tope = tope + 1
+        pila[tope] = valor
+    resultado = []
+    while tope >= 0:
+        resultado.append(pila[tope])
+        tope = tope - 1
+    return resultado
+
+
+def precio_coche(contador, precios):
+    total = 0
+    for fila in range(4):
+        for col in range(4):
+            total = total + contador[fila][col] * precios[col]
     return total
